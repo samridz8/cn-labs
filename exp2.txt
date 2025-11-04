@@ -1,0 +1,81 @@
+# Create a simulator object
+set ns [new Simulator]
+
+# Open trace files
+set nf [open exp2.nam w]
+$ns namtrace-all $nf
+
+set tf [open exp2.tr w]
+$ns trace-all $tf
+
+# Create nodes
+set n0 [$ns node]
+set n1 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+set n4 [$ns node]
+set n5 [$ns node]
+
+# Create duplex links between nodes
+$ns duplex-link $n0 $n5 1Mb 10ms DropTail
+$ns duplex-link $n1 $n5 1Mb 10ms DropTail
+$ns duplex-link $n2 $n5 1Mb 10ms DropTail
+$ns duplex-link $n3 $n5 1Mb 10ms DropTail
+$ns duplex-link $n4 $n5 1Mb 10ms DropTail
+
+# Set queue limits
+$ns queue-limit $n0 $n5 5
+$ns queue-limit $n1 $n5 5
+$ns queue-limit $n2 $n5 2
+$ns queue-limit $n3 $n5 5
+$ns queue-limit $n4 $n5 2
+
+# Assign colors
+$ns color 2 Red
+$ns color 3 Green
+$ns color 4 Blue
+$ns color 5 Yellow
+
+# Create Ping agents
+set p0 [new Agent/Ping]
+$ns attach-agent $n0 $p0
+$p0 set class_ 1
+
+set p1 [new Agent/Ping]
+$ns attach-agent $n1 $p1
+$p1 set class_ 2
+
+set p2 [new Agent/Ping]
+$ns attach-agent $n2 $p2
+$p2 set class_ 3
+
+set p3 [new Agent/Ping]
+$ns attach-agent $n3 $p3
+$p3 set class_ 4
+
+# Create null agents (receivers)
+set null2 [new Agent/Null]
+$ns attach-agent $n4 $null2
+$ns connect $p2 $null2
+
+set null3 [new Agent/Null]
+$ns attach-agent $n5 $null3
+$ns connect $p3 $null3
+
+# Define finish procedure
+proc finish {} {
+    global ns nf tf
+    $ns flush-trace
+    close $nf
+    close $tf
+    exec nam exp2.nam &
+    exit 0
+}
+
+# Schedule events
+$ns at 0.1 "$p2 send"
+$ns at 2.0 "finish"
+
+# Run the simulation
+$ns run
+
