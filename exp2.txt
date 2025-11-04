@@ -79,3 +79,17 @@ $ns at 2.0 "finish"
 # Run the simulation
 $ns run
 
+AWK:
+BEGIN {
+    count = 0;
+}
+{
+    if ($1 == "d") {
+        count++;
+    }
+}
+END {
+    printf("Number of ping packets dropped = %d\n", count);
+}
+
+
