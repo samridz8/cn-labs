@@ -1,0 +1,61 @@
+import java.util.Scanner;
+
+public class exp4 {
+    public static int n;
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        exp4 crc = new exp4();
+
+        String copy, rec, code, zero = "0000000000000000";
+
+        System.out.println("Enter dataword to be sent: ");
+        code = sc.nextLine();
+
+        System.out.println("The data word is " + code);
+        n = code.length();
+
+        System.out.println("The length of dataword is " + n);
+        copy = code;
+        code += zero;
+
+        System.out.println("The modified code word is " + code);
+        code = crc.divide(code);
+        copy = copy.substring(0, n) + code.substring(n);
+
+        System.out.println("CRC =");
+        System.out.println(code.substring(n));
+        System.out.println("Transmitted frame is = " + copy);
+
+        // Now simulate receiving (user can input transmitted frame or modified frame)
+        System.out.println("Enter received data: ");
+        rec = sc.nextLine();
+
+        if (zero.equals(crc.divide(rec).substring(n)))
+            System.out.println("Correct but received ");
+        else
+            System.out.println("received frame contains one or more error ");
+
+        sc.close();
+    }
+
+    public String divide(String s) {
+        String div = "10001000000100001"; // divisor (17 bits)
+        int divLen = div.length();
+        char[] working = s.toCharArray();
+        int len = working.length;
+
+        // perform modulo-2 division (XOR) in-place on working[]
+        for (int i = 0; i <= len - divLen; i++) {
+            if (working[i] == '1') {
+                for (int j = 0; j < divLen; j++) {
+                    // XOR operation: if same -> '0', else '1'
+                    working[i + j] = (working[i + j] == div.charAt(j)) ? '0' : '1';
+                }
+            }
+            // if working[i] == '0' -> skip
+        }
+
+        return new String(working);
+    }
+}
