@@ -1,0 +1,53 @@
+import java.io.*;
+import java.net.*;
+
+public class exp7 {
+    public static void main(String[] args){
+
+        ServerSocket serverSocket = null;
+        Socket socket = null;
+        BufferedReader in = null;
+        PrintWriter out = null;
+        BufferedReader fileReader = null;
+
+        try{
+            serverSocket = new ServerSocket(5001);
+            System.out.println("Server is waiting for client request");
+
+            socket = serverSocket.accept();
+            System.out.println("Client Connected");
+
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
+
+            String fileName = in.readLine();
+            System.out.println("Requested file: "+fileName);
+
+            File file = new File(fileName);
+            if(fileName != null && file.exists() && !file.isDirectory()){
+                fileReader = new BufferedReader(new FileReader(file));
+
+                String line;
+                while((line = fileReader.readLine()) != null){
+                    out.println(line);
+                }
+            }else{
+                out.println("File not found on server.");
+            }
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }finally{
+            try{
+                if(fileReader != null) fileReader.close();
+                if(in != null) in.close();
+                if(out != null) out.close();
+                if(socket != null) socket.close();
+                if(serverSocket != null) serverSocket.close();
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        }
+
+    }
+}
