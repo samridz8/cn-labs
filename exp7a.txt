@@ -1,0 +1,40 @@
+import java.io.*;
+import java.net.*;
+
+public class exp7a {
+    public static void main(String[] args) {
+        Socket socket = null;
+        BufferedReader in = null;
+        PrintWriter out = null;
+        BufferedReader userInput = null;
+
+        try {
+            socket = new Socket("localhost", 5001);
+
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
+            userInput = new BufferedReader(new InputStreamReader(System.in));
+
+            System.out.print("Enter the file name: ");
+            String fileName = userInput.readLine();
+            out.println(fileName);
+
+            String serverResponse;
+            while ((serverResponse = in.readLine()) != null) {
+                System.out.println(serverResponse);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (in != null) in.close();
+                if (out != null) out.close();
+                if (userInput != null) userInput.close();
+                if (socket != null) socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
