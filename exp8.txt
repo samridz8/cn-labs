@@ -1,0 +1,57 @@
+import java.net.*;
+import java.io.*;
+
+public class UDPServer {
+    public static void main(String[] args) {
+        DatagramSocket serverSocket = null;
+        BufferedReader reader = null;
+
+        try {
+            // Create a DatagramSocket to listen on port 9876
+            serverSocket = new DatagramSocket(9876);
+
+            reader = new BufferedReader(new InputStreamReader(System.in));
+
+            System.out.println("Server is running and waiting for messages to send...");
+
+            while (true) {
+                // Get message from server user
+                System.out.print("Type a message to send to the client: ");
+                String message = reader.readLine();
+                byte[] sendData = message.getBytes();
+
+                // Destination client address and port
+                InetAddress clientIPAddress = InetAddress.getByName("localhost");
+                int clientPort = 9877; // Client's port number
+
+                // Create a datagram packet with the data, client IP, and client port
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
+                        clientIPAddress, clientPort);
+
+                // Send the packet to the client
+                serverSocket.send(sendPacket);
+
+                // Exit condition (optional)
+                if (message.equalsIgnoreCase("exit")) {
+                    System.out.println("Server exiting...");
+                    break;
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // Close resources
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
