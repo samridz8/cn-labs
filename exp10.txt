@@ -1,0 +1,85 @@
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class LeakyBucket {
+
+    // Class variables
+    private int bucketCapacity; // Maximum capacity of the bucket
+    private int outputRate; // Constant output rate
+    private Queue<Integer> bucket; // Queue to simulate the buffer (bucket)
+
+    // Constructor to initialize the bucket
+    public LeakyBucket(int capacity, int rate) {
+        this.bucketCapacity = capacity;
+        this.outputRate = rate;
+        this.bucket = new LinkedList<>();
+    }
+
+    // Method to simulate sending packets into the bucket
+    public void receivePackets(int packetSize) {
+        System.out.println("\nPacket of size " + packetSize + " arrived.");
+
+        // Check if the packet can fit into the bucket
+        if (bucket.size() + packetSize <= bucketCapacity) {
+            // Add the packet to the bucket
+            for (int i = 0; i < packetSize; i++) {
+                bucket.add(1); // Using '1' to represent each packet
+            }
+            System.out.println("Bucket successfully received " + packetSize + " packets.");
+        } else {
+            // If the bucket overflows, discard the excess packets
+            System.out.println("Bucket overflow! Packet of size " + packetSize + " cannot be accommodated.");
+        }
+    }
+
+    // Method to simulate the packet output at a constant rate
+    public void transmitPackets() {
+        System.out.println("\nTransmitting packets...");
+
+        // Transmit packets at the constant output rate
+        for (int i = 0; i < outputRate; i++) {
+            if (!bucket.isEmpty()) {
+                bucket.remove(); // Simulate the transmission of one packet
+                System.out.println("1 packet transmitted.");
+            } else {
+                System.out.println("No packets left to transmit.");
+                break;
+            }
+        }
+
+        // Display remaining packets in the bucket after transmission
+        System.out.println("Remaining packets in the bucket: " + bucket.size());
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // User input for bucket capacity and output rate
+        System.out.print("Enter the bucket capacity: ");
+        int capacity = scanner.nextInt();
+
+        System.out.print("Enter the output rate (constant): ");
+        int rate = scanner.nextInt();
+
+        LeakyBucket leakyBucket = new LeakyBucket(capacity, rate);
+
+        // Simulating the arrival of packets and transmitting them
+        while (true) {
+            System.out.print("\nEnter packet size (enter -1 to exit): ");
+            int packetSize = scanner.nextInt();
+
+            if (packetSize == -1) {
+                break;
+            }
+
+            // Receive incoming packets
+            leakyBucket.receivePackets(packetSize);
+
+            // Transmit packets at the constant output rate
+            leakyBucket.transmitPackets();
+        }
+
+        scanner.close();
+    }
+}
