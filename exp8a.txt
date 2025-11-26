@@ -1,0 +1,47 @@
+import java.net.*;
+import java.io.*;
+
+public class UDPClient {
+    public static void main(String[] args) {
+
+        DatagramSocket clientSocket = null;
+
+        try {
+            // Create a DatagramSocket to listen on port 9877
+            clientSocket = new DatagramSocket(9877);
+
+            System.out.println("Client is running and waiting for messages from the server...");
+
+            while (true) {
+                // Buffer to receive incoming data from the server
+                byte[] receiveData = new byte[1024];
+
+                // Create a DatagramPacket to receive the data
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+
+                // Receive the packet from the server
+                clientSocket.receive(receivePacket);
+
+                // Convert the received byte data to a string
+                String message = new String(receivePacket.getData(), 0,
+                        receivePacket.getLength());
+
+                // Display the received message
+                System.out.println("Message from server: " + message);
+
+                // Exit condition if the server sends "exit"
+                if (message.equalsIgnoreCase("exit")) {
+                    System.out.println("Client exiting...");
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // Close the DatagramSocket
+            if (clientSocket != null) {
+                clientSocket.close();
+            }
+        }
+    }
+}
